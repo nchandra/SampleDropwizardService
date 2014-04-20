@@ -1,0 +1,64 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="org.codingpedia.demo.rest.*" />
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/test" />
+		<property name="user" value="root" />
+		<property name="password" value="" />
+
+		<property name="initialPoolSize" value="20" />
+		<property name="minPoolSize" value="20" />
+		<property name="maxPoolSize" value="50" />
+		<property name="maxIdleTime" value="1800" />
+		<property name="acquireIncrement" value="10" />
+		<property name="maxStatements" value="50" />
+
+		<!-- Recovery from DB out age -->
+		<property name="acquireRetryAttempts" value="0" />
+		<property name="acquireRetryDelay" value="1000" />
+
+		<!-- Required. http://www.mchange.com/projects/c3p0/#idleConnectionTestPeriod -->
+		<property name="idleConnectionTestPeriod" value="120" /> <!-- c3p0 will test all idle, pooled but unchecked-out connections, every
+			this number of seconds. -->
+		<property name="testConnectionOnCheckin" value="true" /> <!-- Test the connection when it is returned back to the pool. -->
+		<!-- <property name="automaticTestTable" value="con_test" /> --><!--  For connection testing Or  -->
+		<property name="preferredTestQuery" value="select 1" /><!-- Not needed if automaticTestTable is defined -->
+	</bean>
+
+	<!-- ************ JPA configuration *********** -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceXmlLocation" value="classpath:config/persistence-demo.xml" />
+		<property name="persistenceUnitName" value="demoRestPersistence" />
+		<property name="dataSource" ref="dataSource" />
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="showSql" value="true" />
+				<property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect" />
+			</bean>
+		</property>
+	</bean>
+
+	<!-- bean post-processor for JPA annotations -->
+	<bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
+
+</beans>

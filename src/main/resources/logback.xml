@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+
+	<appender name="ServiceFileAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>logs/service.log
+		</File>
+		<Append>true</Append>
+		<encoder>
+			<pattern>[%d{dd MMM yy HH:mm:ss}] %c %-5p %X{rid} - %m%n</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>logs/service.log.%d{yyyy-MM-dd-HH}.gz
+			</fileNamePattern>
+			<maxHistory>48</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="SQLFileAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<Append>true</Append>
+		<File>logs/sql.log
+		</File>
+		<encoder>
+			<pattern>[%d{dd MMM yy HH:mm:ss}] %c %-5p - %m%n</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>logs/sql.log.%d{yyyy-MM-dd-HH}.gz
+			</fileNamePattern>
+			<maxHistory>48</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="MetricsAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<Append>true</Append>
+		<File>logs/service_metrics.log
+		</File>
+		<encoder>
+			<pattern>%m%n</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>logs/service_metrics.log.%d{yyyy-MM-dd-HH}.gz
+			</fileNamePattern>
+			<maxHistory>48</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+	<root level="DEBUG">
+		<appender-ref ref="ServiceFileAppender" />
+	</root>
+
+	<logger name="com.nishant" level="INFO" additivity="false">
+		<appender-ref ref="ServiceFileAppender" />
+	</logger>
+
+	<logger name="org.hibernate" level="WARN" additivity="false">
+		<appender-ref ref="SQLFileAppender" />
+	</logger>
+
+	<logger name="com.mchange" level="WARN" additivity="false">
+		<appender-ref ref="SQLFileAppender" />
+	</logger>
+
+	<logger name="org.springframework" level="WARN" additivity="false">
+		<appender-ref ref="ServiceFileAppender" />
+	</logger>
+
+</configuration>
